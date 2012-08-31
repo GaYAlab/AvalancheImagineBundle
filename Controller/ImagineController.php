@@ -42,8 +42,6 @@ class ImagineController
      */
     private $webRoot;
 
-    private $sourceRoot;
-
     /**
      * Constructs by setting $cachePathResolver
      *
@@ -60,8 +58,7 @@ class ImagineController
         ImagineInterface $imagine,
         FilterManager $filterManager,
         Filesystem $filesystem,
-        $webRoot,
-        $sourceRoot
+        $webRoot
     )
     {
         $this->request           = $request;
@@ -70,7 +67,6 @@ class ImagineController
         $this->filterManager     = $filterManager;
         $this->filesystem        = $filesystem;
         $this->webRoot           = $webRoot;
-        $this->sourceRoot        = $sourceRoot;
     }
 
     /**
@@ -100,7 +96,7 @@ class ImagineController
         }
 
         $realPath = $this->webRoot.$browserPath;
-        $sourcePath = $this->sourceRoot.$path;
+        $sourcePath = $this->webRoot.$path;
 
         // if the file has already been cached, we're probably not rewriting
         // correctly, hence make a 301 to proper location, so browser remembers
@@ -119,7 +115,7 @@ class ImagineController
         $dir = pathinfo($realPath, PATHINFO_DIRNAME);
 
         if (!is_dir($dir)) {
-            if (false === $this->filesystem->mkdir($dir)) {
+            if (!$this->filesystem->mkdir($dir)) {
                 throw new \RuntimeException(sprintf(
                     'Could not create directory %s', $dir
                 ));
@@ -128,19 +124,15 @@ class ImagineController
 
         ob_start();
         try {
-            $filters = explode('.', $filter);
-            $image = $this->imagine->open($sourcePath);
-            foreach ($filters as $filter) {
-                $image = $this->filterManager->get($filter)
-                    ->apply($image);
-            }
             // TODO: get rid of hard-coded quality and format
-            $image->save($realPath, array('quality' => $this->filterManager->getOption($filter, "quality", 100)))
-                ->show($this->filterManager->getOption($filter, "format", "png"));
+            $this->filterManager->get($filter)
+                ->apply($this->imagine->open($sourcePath))
+                ->save($realPath, array('quality' => 100))
+                ->show('png');
 
             // TODO: add more media headers
             return new Response(ob_get_clean(), 201, array(
-                'content-type' => 'image/' . $this->filterManager->getOption($filter, "format", "png"),
+                'content-type' => 'image/png',
             ));
         } catch (\Exception $e) {
             ob_end_clean();

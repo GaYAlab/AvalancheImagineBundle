@@ -127,19 +127,6 @@ avalanche_imagine:
             options: { size: [120, 90], mode: outbound }
 ```
 
-You can also change the quality and the format you want to use to save our image : 
-
-
-``` yaml
-# app/config/config.yml
-
-avalanche_imagine:
-    filters:
-        my_thumb:
-            type:    thumbnail
-            options: { size: [120, 90], mode: outbound, quality: 100, format: png }
-```
-
 You've now defined a filter called `my_thumb` that performs a thumbnail transformation.
 We'll learn more about available transformations later, but for now, this
 new filter can be used immediately in a template:
@@ -152,15 +139,6 @@ Or if you're using PHP templates:
 
 ``` php
 <img src="<?php $this['imagine']->filter('/relative/path/to/image.jpg', 'my_thumb') ?>" />
-```
-
-It's also possible to apply multiple filters by passing additional arguments or
-by joining them into a single string with commas and optional whitespace
-(for example to make a thumbnail and rotate it):
-
-``` jinja
-<img src="{{ '/relative/path/to/image.jpg' | apply_filter('my_thumb', 'my_other_filter') }}" />
-<img src="{{ '/relative/path/to/image.jpg' | apply_filter('my_thumb, my_other_filter') }}" />
 ```
 
 Behind the scenes, the bundle applies the filter(s) to the image on the first
@@ -177,7 +155,6 @@ The default configuration for the bundle looks like this:
 
 ``` yaml
 avalanche_imagine:
-    source_root:  %kernel.root_dir%/../web
     web_root:     %kernel.root_dir%/../web
     cache_prefix: media/cache
     driver:       gd
@@ -185,14 +162,6 @@ avalanche_imagine:
 ```
 
 There are several configuration options available:
-
- - `source_root` - can be set to the absolute path to your original image's
-    directory. This option allows you to store the original image in a 
-    different location from the web root. Under this root the images will 
-    be looked for in the same relative path specified in the apply_filter
-    template filter.
-
-    default: `%kernel.root_dir%/../web`
 
  - `web_root` - must be the absolute path to you application's web root. This
     is used to determine where to put generated image files, so that apache
@@ -217,7 +186,7 @@ Each filter that you specify have the following options:
 
  - `type` - determine the type of filter to be used, refer to *Filters* section for more information
  - `options` - options that should be passed to the specific filter type
- - `path` - override the global `cache_prefix` and replace it with this path (this option is not compatible with applying multiple filters)
+ - `path` - override the global `cache_prefix` and replace it with this path
 
 ## Built-in Filters
 

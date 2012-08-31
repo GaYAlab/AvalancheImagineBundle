@@ -38,23 +38,12 @@ class ImagineExtension extends \Twig_Extension
      *
      * @param string $path
      * @param string $filter
-     * @param boolean $absolute
      *
      * @return string
      */
-    public function applyFilter()
+    public function applyFilter($path, $filter)
     {
-        $args = func_get_args();
-        $path = array_shift($args);
-        if (is_bool(end($args))) {
-            $absolute = array_pop($args);
-        }
-        else {
-            $absolute = false;
-        }
-        $filter = implode('.', $args);
-        $filter = preg_replace('/,\s*/', '.', $filter);
-        return $this->cachePathResolver->getBrowserPath($path, $filter, $absolute);
+        return $this->cachePathResolver->getBrowserPath($path, $filter);
     }
 
     /**

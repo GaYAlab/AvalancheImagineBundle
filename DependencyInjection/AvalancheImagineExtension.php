@@ -26,13 +26,13 @@ class AvalancheImagineExtension extends Extension
             $driver = strtolower($config['driver']);
         }
 
-        if (!in_array($driver, array('gd', 'imagick', 'gmagick'))) {
+        if (!in_array($driver, array('gd', 'imagick'))) {
             throw new \InvalidArgumentException('Invalid imagine driver specified');
         }
 
         $container->setAlias('imagine', new Alias('imagine.'.$driver));
 
-        foreach (array('cache_prefix', 'web_root', 'source_root', 'filters') as $key) {
+        foreach (array('cache_prefix', 'web_root', 'filters') as $key) {
             if (isset($config[$key])) {
                 $container->setParameter('imagine.'.$key, $config[$key]);
             }
